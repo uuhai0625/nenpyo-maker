@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>
+  (function() {
+    var GA_ID = 'G-M100QNNK6B';
+    var isLocalDev = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    if (isLocalDev) return;
+    try { if (/[?&]no_ga=0/.test(location.search)) localStorage.removeItem('no_ga'); if (/[?&]no_ga=1/.test(location.search)) localStorage.setItem('no_ga', '1'); if (localStorage.getItem('no_ga') === '1') return; } catch (e) {}
+    var gaQ = new URLSearchParams(location.search); if (gaQ.get('obs') === '1' || gaQ.get('no_ga') === '1') return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    document.addEventListener('click', function(e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href*="booth.pm"]') : null;
+      if (!a) return;
+      gtag('event', 'booth_click', { link_url: a.href, link_id: a.id || '', link_text: (a.textContent || '').trim().slice(0, 40) });
+    });
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="年表を無料で作成・印刷。「年と出来事」を1行ずつ入れるだけで、年の順に並べた年表ができます。和暦(昭和・平成・令和)と年齢の列も入れられます。表の年表(A4縦)と横に流れる年表(A4横)。自分史・就活の振り返り・創作のキャラ年表・歴史のまとめに。登録不要。">
+<link rel="canonical" href="https://uuhai0625.github.io/nenpyo-maker/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="年表メーカー|年表を無料で作成・印刷(自分史・創作キャラ年表・和暦・年齢つき)">
+<meta property="og:description" content="年表を無料で作成・印刷。「年と出来事」を1行ずつ入れるだけで、年の順に並べた年表ができます。和暦(昭和・平成・令和)と年齢の列も入れられます。表の年表(A4縦)と横に流れる年表(A4横)。自分史・就活の振り返り・創作のキャラ年表・歴史のまとめに。登録不要。">
+<meta property="og:url" content="https://uuhai0625.github.io/nenpyo-maker/">
+<title>年表メーカー|年表を無料で作成・印刷(自分史・創作キャラ年表・和暦・年齢つき)</title>
+<style>
+  :root {
+    --bg: #f5f3f8;
+    --panel: #ffffff;
+    --border: #ddd7e6;
+    --field-border: #554d60;
+    --text: #241f2b;
+    --muted: #574f61;
+    --accent: #5b4a8a;
+    --accent-dark: #43356b;
+    --ng: #b3261e;
+    --locked: #d3cbe0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  header { background: var(--accent-dark); color: #fff; padding: 24px 20px 18px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  header p { margin: 0; font-size: .9rem; }
+  main { max-width: 1120px; margin: 0 auto; padding: 22px 16px 50px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "ev pv" "opt pv" "look pv"; column-gap: 18px; align-items: start; }
+  .layout > * { min-width: 0; }
+  #ev-card { grid-area: ev; } #opt-card { grid-area: opt; } #look-card { grid-area: look; }
+  #pv-card { grid-area: pv; position: sticky; top: 12px; }
+  section.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+  section.card h2 { margin: 0 0 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fine { color: var(--muted); font-size: .86rem; margin: 8px 0 0; }
+  .badge { display: inline-block; font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: #e9e3f4; color: #43356b; font-weight: bold; }
+  .hidden { display: none !important; }
+  label.field, div.field { display: block; margin-bottom: 12px; }
+  .lbl { font-size: .9rem; font-weight: bold; display: block; }
+  .hint { font-size: .875rem; color: var(--muted); font-weight: normal; display: block; margin-top: 2px; }
+  select, input[type=text], textarea { margin-top: 5px; min-height: 44px; border: 1px solid var(--field-border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: #fff; color: var(--text); width: 100%; padding: 8px 10px; }
+  textarea { min-height: 200px; resize: vertical; line-height: 1.5; }
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; min-width: 0; }
+  .chk { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: .92rem; cursor: pointer; }
+  .chk input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn { min-height: 44px; min-width: 44px; padding: 9px 16px; border-radius: 8px; font-size: .9rem; cursor: pointer; border: 1px solid var(--field-border); background: #fff; color: var(--text); font-family: inherit; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .btn.small { padding: 6px 12px; font-size: .85rem; }
+  .btn:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #c2410c; outline-offset: 2px; }
+  .btn-row .btn { flex: 1; }
+  .status { font-size: .88rem; color: var(--muted); margin-top: 6px; min-height: 1.2em; }
+  .status.err { color: var(--ng); font-weight: bold; }
+  .status:empty { min-height: 0; margin: 0; }
+  .pv { border: 1px solid var(--border); border-radius: 8px; background: #e6e2ed; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .pv canvas { width: 100%; height: auto; display: block; box-shadow: 0 1px 4px rgba(0,0,0,.25); background: #fff; }
+  .guide { font-size: .9rem; }
+  .guide h3 { font-size: .95rem; margin: 14px 0 4px; }
+  .guide ul, .guide ol { padding-left: 1.3em; margin: 6px 0; }
+  .guide li { margin: 4px 0; }
+  .locked-panel { border: 1px dashed var(--locked); border-radius: 10px; padding: 16px; text-align: center; color: var(--muted); background: #faf9fc; }
+  .locked-panel .lead { color: var(--text); font-weight: bold; }
+  .locked-panel .feat-list { text-align: left; max-width: 620px; margin: 10px auto; font-size: .88rem; padding-left: 1.2em; }
+  .buy-btn { display: inline-block; margin-top: 8px; background: var(--accent-dark); color: #fff; font-weight: bold; padding: 11px 22px; border-radius: 999px; text-decoration: none; font-size: .9rem; }
+  footer { max-width: 1120px; margin: 0 auto; padding: 0 16px 40px; font-size: .84rem; color: var(--muted); }
+  footer p { margin: 10px 0; }
+  footer a { color: var(--muted); display: inline-block; padding: 4px 0; }
+  #printArea { display: none; }
+  .jump { display: none; margin-top: 6px; font-size: .95rem; padding: 10px 0; }
+  @media (min-width: 861px) {
+    .pv canvas { max-height: calc(100vh - 120px); width: auto; max-width: 100%; }
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "ev" "opt" "look" "pv"; }
+    #pv-card { position: static; }
+    .jump { display: inline-block; }
+  }
+  @media (max-width: 600px) {
+    .row2 { flex-direction: column; gap: 0; }
+    section.card { padding: 16px 12px; }
+  }
+  @media print {
+    body.printing > * { display: none !important; }
+    body.printing > #printArea { display: block !important; }
+    #printArea img { display: block; break-after: page; }
+    #printArea img:last-child { break-after: auto; }
+  }
+</style>
+<style id="pageStyle">@page { size: A4 portrait; margin: 0; }</style>
+<!--ANSHIN_CSS_START--><style>:root{--anshin-w:1088px;--anshin-pad:16px}.anshin-strip,.anshin{box-sizing:border-box;width:min(var(--anshin-w),calc(100% - 2 * var(--anshin-pad)));margin-left:auto;margin-right:auto}.anshin-strip{list-style:none;margin-top:10px;margin-bottom:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;line-height:1.5}.anshin-strip li{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid rgba(20,120,90,.45);border-radius:999px;background:rgba(20,120,90,.07)}.anshin-strip li.anshin-more{border:0;background:none;padding:3px 2px}.anshin-strip a,.anshin a{color:inherit}.anshin{margin-top:18px;margin-bottom:18px;padding:14px 18px;border:1px solid rgba(20,120,90,.45);border-radius:10px;background:rgba(20,120,90,.05);font-size:.86rem;line-height:1.7}.anshin h2{font-size:1rem;margin:0 0 6px}.anshin p{margin:0 0 6px}.anshin ul{margin:0;padding-left:1.2em}.anshin li{margin:3px 0}.anshin details{margin-top:6px}.anshin summary{cursor:pointer;font-weight:bold}.anshin .anshin-meta{margin:8px 0 0;font-size:.8rem;opacity:.85}@media print{.anshin,.anshin-strip{display:none!important}}</style><!--ANSHIN_CSS_END-->
+</head>
+<body>
+
+<header>
+  <h1>年表メーカー</h1>
+  <p>「年と出来事」を1行ずつ入れるだけで、年表を作って印刷できます。年の順に自動で並べ、和暦(昭和・平成・令和)や年齢も入れられます。自分史・就活の振り返り・創作のキャラ年表・歴史のまとめに。登録不要・スマホでも使えます</p>
+</header>
+<!--ANSHIN_STRIP_START-->
+<ul class="anshin-strip" aria-label="データの扱い">
+  <li><span aria-hidden="true">✓</span> 入力内容はこの端末の中だけで処理</li>
+  <li><span aria-hidden="true">✓</span> 登録・ログイン不要</li>
+  <li><span aria-hidden="true">✓</span> 仕組みを公開中</li>
+  <li class="anshin-more"><a href="#anshin">データの扱いをくわしく</a></li>
+</ul>
+<!--ANSHIN_STRIP_END-->
+
+<main>
+<div class="layout">
+
+  <section class="card" id="ev-card">
+    <h2>① 出来事</h2>
+    <label class="field"><span class="lbl">年表の名前(空欄でもかまいません)</span><input type="text" id="inTitle" maxlength="30" placeholder="例: わたしの年表"></label>
+    <label class="field"><span class="lbl">年と出来事(1行に1つ)</span><textarea id="inEvents" spellcheck="false" placeholder="例:&#10;1995 生まれる&#10;2002年4月 小学校に入学&#10;2014 部活でキャプテンになる" aria-describedby="evHint"></textarea><span class="hint" id="evHint"></span></label>
+    <a class="jump" href="#pv-card">見本へ ↓</a>
+  </section>
+
+  <section class="card" id="opt-card">
+    <h2>② 年齢・和暦</h2>
+    <div class="row2">
+      <label class="field"><span class="lbl">生まれた年(年齢の列を入れるとき)</span><input type="text" id="inBirth" inputmode="numeric" maxlength="6" placeholder="例: 1995"><span class="hint">空欄なら年齢の列は入りません</span></label>
+      <label class="field"><span class="lbl">年の書き方</span><select id="inEra"><option value="ad" selected>西暦だけ</option><option value="both">西暦と和暦</option><option value="none">年を数字のまま(創作の暦など)</option></select></label>
+    </div>
+    
+    <a class="jump" href="#pv-card">見本へ ↓</a>
+  </section>
+
+  <section class="card" id="look-card">
+    <h2>③ 形と見た目</h2>
+    <div class="row2">
+      <label class="field"><span class="lbl">形</span><select id="inShape"><option value="table" selected>表の年表(A4縦)</option><option value="line">横に流れる年表(A4横)</option></select></label>
+      <label class="field"><span class="lbl">色</span><select id="inColor"><option value="purple" selected>紫</option><option value="blue">青</option><option value="green">緑</option><option value="mono">白黒(インクを節約)</option></select></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="inStripe" checked> 1行おきに色をつける(表の年表)</label>
+    <div class="btn-row"><button type="button" class="btn small" id="clearBtn">入力を全部消す</button></div>
+  </section>
+
+  <section class="card" id="pv-card">
+    <h2>④ 見本・印刷</h2>
+    <p class="status" id="sumNote"></p>
+    <p class="status" id="warnNote" role="status"></p>
+    <label class="field hidden" id="pageField"><span class="lbl">見本のページ</span><select id="inPage"></select></label>
+    <div class="btn-row" style="margin-top:0">
+      <button type="button" class="btn primary" id="printBtn">印刷する</button>
+      <button type="button" class="btn" id="pngBtn">画像で保存</button>
+    </div>
+    <div class="status" id="outSt" role="status"></div>
+    <div class="pv" id="pv"></div>
+    <p class="fine">印刷は倍率「100%」で。出来事が多いときは、自動でページを分けます。</p>
+    <a class="jump" href="#ev-card">↑ 入力に戻る</a>
+  </section>
+
+</div>
+
+  <section class="card" id="pro-section">
+    <h2>キャラ別・人物別の年表 <span class="badge">買い切り版 ¥100(税込)</span></h2>
+    <div class="locked-panel">
+      <p class="lead">複数のキャラクターや家族の年表を、1枚に並べて。</p>
+      <p>このページの機能は無料でそのまま使えます。買い切り版(ダウンロード購入)では、次の機能が増えます:</p>
+      <ul class="feat-list">
+        <li><strong>人物・分類ごとに列を分ける</strong>(最大6列・表の年表のみ)。キャラ別年表・家族の年表・「世の中の出来事」と並べた自分史・就活の「気持ち」「学んだこと」の列に</li>
+        <li><strong>列ごとの年齢</strong>: 名前と生まれた年を書くと、それぞれの年齢が入ります</li>
+        <li><strong>出来事500件まで</strong>(無料版は30件まで)</li>
+        <li><strong>2枚以上の画像はZIPでまとめて保存・ツール名が入りません</strong>(無料版は1枚ずつ保存、用紙の右下に小さくツール名が入ります)</li>
+        <li><strong>パソコンで使うHTMLファイルです</strong>(スマホでの動作は保証していません)。ダウンロードしたファイルなので、ネットにつながっていなくても開けます</li>
+      </ul>
+      <a class="buy-btn" href="https://uuhai0625.booth.pm/items/9019485" id="buyLink" target="_blank" rel="noopener">パソコン用の買い切り版を見る(BOOTH・新しいタブ)</a>
+    </div>
+  </section>
+
+  <section class="card guide" id="guide">
+    <h2>年表の作り方</h2>
+    <ol>
+      <li>1行に「年 出来事」を入れます。「2002年4月 入学」のように月も入れられます。Excelの列(年・出来事)をそのまま貼り付けても、「|」で区切ってもかまいません。</li>
+      <li>順番はばらばらでも、年の順に並べます。同じ年の出来事は、入れた順のまま並べます。</li>
+      <li>年齢の列がほしいときは、生まれた年を入れます。和暦もいっしょに出せます。</li>
+    </ol>
+    <h3>よくある質問</h3>
+    <ul>
+      <li><strong>紀元前や、架空の暦は?</strong> 「-50」「紀元前50」のように書くと紀元前50年として並べます(西暦に0年はありません)。創作の暦(「王国暦120年」など)は、「年を数字のまま」にして「120 建国」のように年の数字だけ入れてください。</li>
+      <li><strong>和暦は?</strong> 明治(1868年)からです。切りかわりの年は、月を書くとその月で分け(1989年1月は「昭和64・平成元」、2月からは平成)、月がないときは両方を書きます。1872年以前は旧暦のため、月や年の境目が西暦とずれることがあります。</li>
+      <li><strong>年齢はどう数える?</strong> その年の誕生日のあとの満年齢(年 − 生まれた年)です。誕生日の前の出来事は、本当の年齢より1つ多くなります。数え年には対応していません。</li>
+      <li><strong>横に流れる年表の間隔は?</strong> 年の差に関係なく、等間隔に並べます。1ページに10件までで、多いときはページを分けます。</li>
+      <li><strong>入れた内容はどこかに送られる?</strong> どこにも送られません。すべてこのブラウザの中で処理し、このブラウザにだけ自動で保存します。共用のパソコンでは、使い終わったら「入力を全部消す」を押してください。</li>
+    </ul>
+  </section>
+
+</main>
+
+<!--ANSHIN_START-->
+<section class="anshin" id="anshin" aria-labelledby="anshin-title">
+  <h2 id="anshin-title">データの扱いについて</h2>
+  <p>このページには、入力した内容を受け取る仕組みがありません。入力した文字や数字は、あなたのスマホやパソコンの中だけで処理されます。</p>
+  <ul>
+    <li>会員登録・ログイン・メールアドレスの入力はありません。</li>
+    <li>自分で確かめたい方へ: ページを開いたあと機内モードにしても、そのまま使えます。</li>
+  </ul>
+  <details>
+    <summary>もっとくわしく(保存・アクセス解析・公開について)</summary>
+    <ul>
+      <li>保存されるデータは、この端末のこのブラウザの中にだけ残ります(localStorage・sessionStorage)。共用のパソコンでは使い終わったら消してください。</li>
+      <li>アクセス解析(Google Analytics)のため、見たページのURL・参照元・端末やブラウザの種類・おおよその地域(IPアドレスから推定)・Cookieの識別子・BOOTHへのリンクのクリック・どのボタンを押したか(回数や選んだ設定を含む)がGoogleに送られます。目的は利用状況の把握です。入力した文字や画像は送りません。(<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用</a>/<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener">計測を止めるアドオン</a>。止めてもツールはそのまま使えます)</li>
+      <li>このツールの結果や作成物は目安です。入稿・契約・販売などの前には、印刷所や公式の情報でご確認ください。</li>
+      <li>処理の中身はすべて公開しています(詳しい方向け: <a href="https://github.com/uuhai0625/nenpyo-maker" target="_blank" rel="noopener">GitHub</a>)。</li>
+    </ul>
+  </details>
+  <p class="anshin-meta">作っている人: ウーハイ(個人開発)/不具合・ご質問は<a href="https://x.com/uuhai0625" target="_blank" rel="noopener">X(@uuhai0625)</a>へ/<a href="https://uuhai0625.github.io/" target="_blank" rel="noopener">ほかのツール</a>/この説明の更新日: 2026-10-13</p>
+</section>
+<!--ANSHIN_END-->
+
+<footer>
+  <p id="privacyNote">入力した内容はどこにも送信されません(すべてこのブラウザの中で処理し、このブラウザにだけ自動で保存します)。</p>
+  <p><a href="https://uuhai0625.booth.pm/" target="_blank" rel="noopener">他のツールも見る(BOOTHショップ)</a></p>
+  <p>不具合・ご要望は X <a href="https://x.com/uuhai0625" target="_blank" rel="noopener">@uuhai0625</a> まで。</p>
+  <p class="related-tools no-print">関連する無料ツール: <a href="https://uuhai0625.github.io/soukanzu-maker/" target="_blank" rel="noopener">相関図メーカー</a> ・ <a href="https://uuhai0625.github.io/tabi-shiori/" target="_blank" rel="noopener">旅のしおりメーカー</a> ・ <a href="https://uuhai0625.github.io/#free-tools">ツール一覧</a></p>
+</footer>
+
+<div id="printArea"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var EDITION = "free"; // "full" で買い切り完全版
+
+  function track(name, params) {
+    if (!window.dataLayer) return;
+    (function () { window.dataLayer.push(arguments); })("event", name, params || {});
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  function setSt(id, msg, err) { var e = $(id); if (!e) return; if (e.textContent !== msg) e.textContent = msg; e.classList.toggle("err", !!err); }
+
+  var CREDIT = true, MAXE = 30, LANES = false;
+  
+  var STORE = EDITION === "full" ? "uuhai-nenpyo-v1-full" : "uuhai-nenpyo-v1";
+  var FONT = '"BIZ UDPGothic", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif';
+  var THEMES = { purple: ["#5b4a8a", "#efebf6"], blue: ["#2a5f9e", "#e7eff9"], green: ["#2f7a57", "#e5f2eb"], mono: ["#333333", "#efefef"] };
+  var ERAS = [[2019, "令和"], [1989, "平成"], [1926, "昭和"], [1912, "大正"], [1868, "明治"]];
+
+  // ===== 入力 =====
+  function clip(s, n) { return Array.from(String(s || "").trim()).slice(0, n).join(""); }
+  // 行のはじめの年(と月)を読む。「2002年4月」「2002/4」「2002.4」「2002-04」、Excelの列(年・月・出来事)に対応
+  var HEAD_RE = /^(紀元前|BC|B\.C\.)?\s*(-?\d{1,6})(?!\d)[ ]*(年)?([\s\S]*)$/i;
+  function parse(eraMode) {
+    var out = [], bad = [], empty = [], zero = [];
+    $("inEvents").value.split(/\r?\n/).forEach(function (line, idx) {
+      var t = line.normalize("NFKC").trim(); if (!t) return;
+      var m = t.match(HEAD_RE);
+      if (!m) { bad.push(clip(t, 12)); return; }
+      var y = parseInt(m[2], 10); if (m[1]) y = -Math.abs(y);
+      var rest = m[4], mo = 0, mm;
+      if (m[3] && (mm = rest.match(/^(\d{1,2})\s*月(?:\s*\d{1,2}\s*日)?/)) && +mm[1] >= 1 && +mm[1] <= 12) { mo = +mm[1]; rest = rest.slice(mm[0].length); }
+      else if (!m[3] && (mm = rest.match(/^[\/.\-](\d{1,2})(?:[\/.\-]\d{1,2})?(?!\d)/)) && +mm[1] >= 1 && +mm[1] <= 12) { mo = +mm[1]; rest = rest.slice(mm[0].length); }
+      else if ((mm = rest.match(/^[ ]*\t[ ]*(\d{1,2})[ ]*月?[ ]*(?=\t)/)) && +mm[1] >= 1 && +mm[1] <= 12) { mo = +mm[1]; rest = rest.slice(mm[0].length); }
+      rest = rest.replace(/^\s*[|｜\t]?\s*/, "");
+      var cols = rest.split(/[|｜\t]/), text = clip(cols[0], 80), lane = clip(cols[1], 12);
+      if (y === 0 && eraMode !== "none") { zero.push(clip(t, 12)); return; }
+      if (!text) { empty.push(clip(t, 12)); return; }
+      out.push({ y: y, m: mo, text: text, lane: lane, i: idx });
+    });
+    return { list: out, bad: bad, empty: empty, zero: zero };
+  }
+  function lanesConf(events) {
+    var lanes = [], birth = {};
+    if (!LANES || !$("inLanes")) return { lanes: lanes, birth: birth };
+    $("inLanes").value.split(/\r?\n/).forEach(function (l) {
+      var m = l.normalize("NFKC").trim().match(/^(.+?)\s+(-?\d{1,6})$/) || [null, l.trim(), null];
+      var nm = clip(m[1], 12); if (!nm) return;
+      if (lanes.indexOf(nm) < 0) lanes.push(nm);
+      if (m[2]) birth[nm] = parseInt(m[2], 10);
+    });
+    events.forEach(function (e) { if (e.lane && lanes.indexOf(e.lane) < 0) lanes.push(e.lane); });
+    // 列の名前がない出来事は、いちばん左の「出来事」の列にまとめる
+    if (lanes.length && events.some(function (e) { return !e.lane; })) { var di = lanes.indexOf("出来事"); if (di >= 0) lanes.splice(di, 1); lanes.unshift("出来事"); events.forEach(function (e) { if (!e.lane) e.lane = "出来事"; }); }
+    return { lanes: lanes, birth: birth };
+  }
+  function conf() {
+    var era = $("inEra").value, P = parse(era), list = P.list.slice(0, MAXE), b = $("inBirth").value.normalize("NFKC").trim(), birth = /^-?\d{1,6}$/.test(b) ? parseInt(b, 10) : null;
+    // 上限は入力した順で数え、そのあと年の順に並べる
+    list.sort(function (a, c) { return a.y - c.y || a.m - c.m || a.i - c.i; });
+    var L = lanesConf(list), useLanes = LANES && L.lanes.length > 0;
+    if (useLanes && L.birth["出来事"] === undefined && birth !== null) L.birth["出来事"] = birth;
+    return {
+      title: $("inTitle").value.trim(), list: list, total: P.list.length, cut: P.list.length > MAXE, bad: P.bad, empty: P.empty, zero: P.zero,
+      birth: birth, era: era, shape: $("inShape").value === "line" ? "line" : "table",
+      theme: THEMES[$("inColor").value] || THEMES.purple, stripe: $("inStripe").checked,
+      lanes: useLanes ? L.lanes.slice(0, 6) : [], laneBirth: L.birth, laneCut: useLanes && L.lanes.length > 6
+    };
+  }
+  // 切りかわりの月(その月は両方を書く)
+  var ERA_MONTH = { 1912: 7, 1926: 12, 1989: 1, 2019: 5 };
+  function eraOf(y, mo) {
+    if (y < 1868) return "";
+    for (var i = 0; i < ERAS.length; i++) {
+      var e = ERAS[i];
+      if (y >= e[0]) {
+        var cur = e[1] + (y - e[0] + 1 === 1 ? "元" : (y - e[0] + 1)), p = ERAS[i + 1];
+        if (y === e[0] && p) {
+          var prev = p[1] + (y - p[0] + 1), bm = ERA_MONTH[y];
+          if (mo && bm && mo < bm) return prev;
+          if (mo && bm && mo > bm) return cur;
+          return prev + "・" + cur;
+        }
+        return cur;
+      }
+    }
+    return "";
+  }
+  function yearLabel(C, ev) {
+    var y = ev.y < 0 && C.era !== "none" ? "紀元前" + (-ev.y) + "年" : ev.y + (C.era === "none" ? "" : "年");
+    return y + (ev.m ? (C.era === "none" ? " " : "") + ev.m + "月" : "");
+  }
+
+  // ===== 描画 =====
+  var NO_HEAD = "、。,.)」』】〕!?！？ーぁぃぅぇぉっゃゅょァィゥェォッャュョ…";
+  function wrap(ctx, text, maxW) {
+    var lines = [], cur = "";
+    Array.from(text).forEach(function (ch) { if (ctx.measureText(cur + ch).width > maxW && cur && NO_HEAD.indexOf(ch) < 0) { lines.push(cur); cur = ch; } else cur += ch; });
+    if (cur) lines.push(cur);
+    // 最後の行が1文字だけなら前の行にもどす
+    if (lines.length > 1 && Array.from(lines[lines.length - 1]).length === 1 && ctx.measureText(lines[lines.length - 2] + lines[lines.length - 1]).width <= maxW * 1.08) lines[lines.length - 2] += lines.pop();
+    return lines.length ? lines : [""];
+  }
+  // 表の年表: 行を作ってページに分ける
+  function tableLayout(C, ctx, k) {
+    var W = 210, H = 297, m = 14, lanes = C.lanes, ageW = !lanes.length && C.birth !== null ? 14 : 0;
+    // 年の列は、いちばん長い年の書き方に合わせる(和暦は同じ行に小さく)
+    var yearW = 18;
+    C.list.forEach(function (ev) {
+      ctx.font = "bold " + (3.9 * k) + "px " + FONT; var w = ctx.measureText(yearLabel(C, ev)).width / k;
+      if (C.era === "both") { var e = eraOf(ev.y, ev.m); if (e) { ctx.font = (3.2 * k) + "px " + FONT; w += 1.5 + ctx.measureText(e).width / k; } }
+      yearW = Math.max(yearW, w + 4);
+    });
+    yearW = Math.min(yearW, 70);
+    var bodyW = W - 2 * m - yearW - ageW, colW = lanes.length ? bodyW / lanes.length : bodyW, fs = 4.2, lh = fs * 1.45, minH = lh + 3;
+    ctx.font = (fs * k) + "px " + FONT;
+    var rows = [];
+    if (!lanes.length) {
+      C.list.forEach(function (ev) { var ls = wrap(ctx, ev.text, (colW - 4) * k); rows.push({ ev: ev, cells: [ls], h: Math.max(minH, ls.length * lh + 3) }); });
+    } else {
+      // 同じ年・月の出来事を1行にまとめ、列ごとに入れる
+      var groups = [];
+      C.list.forEach(function (ev) { var g = groups[groups.length - 1]; if (!g || g.ev.y !== ev.y || g.ev.m !== ev.m) { g = { ev: ev, items: lanes.map(function () { return []; }) }; groups.push(g); } var li = lanes.indexOf(ev.lane); if (li < 0) li = 0; g.items[li].push(ev.text); });
+      groups.forEach(function (g) {
+        var cells = g.items.map(function (arr, li) {
+          var ls = [], age = ageText(C.laneBirth[lanes[li]], g.ev.y, C.era);
+          arr.forEach(function (t, ti) { ls = ls.concat(wrap(ctx, (ti === 0 && age ? "(" + age + ")" : "") + (arr.length > 1 ? "・" : "") + t, (colW - 3) * k)); });
+          return ls;
+        });
+        var mx = 0; cells.forEach(function (c) { mx = Math.max(mx, c.length); });
+        rows.push({ ev: g.ev, cells: cells, h: Math.max(minH, mx * lh + 3) });
+      });
+    }
+    var top = m + 22, headH = 8, avail = H - m - 6 - top - headH, pages = [[]], used = 0, maxLines = Math.floor((avail - 3) / lh);
+    // 1行がページより高くなるときは、入りきる行数で切る
+    rows.forEach(function (r) { r.cells = r.cells.map(function (ls) { if (ls.length > maxLines) { ls = ls.slice(0, maxLines); ls[maxLines - 1] += "…"; r.clipped = true; } return ls; }); var mx = 0; r.cells.forEach(function (c) { mx = Math.max(mx, c.length); }); r.h = Math.max(minH, mx * lh + 3); });
+    rows.forEach(function (r) { if (used + r.h > avail && pages[pages.length - 1].length) { pages.push([]); used = 0; } pages[pages.length - 1].push(r); used += r.h; });
+    return { W: W, H: H, m: m, yearW: yearW, ageW: ageW, colW: colW, fs: fs, lh: lh, top: top, headH: headH, pages: pages, clipped: rows.some(function (r) { return r.clipped; }) };
+  }
+  function ageText(birth, y, eraMode) { if (birth === null || birth === undefined) return ""; var a = y - birth; if (eraMode !== "none" && birth < 0 && y > 0) a -= 1; return a >= 0 ? a + "歳" : ""; }
+  function drawTable(ctx, C, T, pi, k) {
+    var W = T.W, H = T.H, m = T.m, col = C.theme[0];
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W * k, H * k);
+    ctx.fillStyle = col; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.font = "bold " + (7.5 * k) + "px " + FONT;
+    var title = (C.title || "年表") + (T.pages.length > 1 ? "  (" + (pi + 1) + "/" + T.pages.length + ")" : "");
+    while (ctx.measureText(title).width > (W - 2 * m) * k) { var s = parseFloat(ctx.font.replace(/^bold /, "")) * 0.92; ctx.font = "bold " + s + "px " + FONT; }
+    ctx.fillText(title, m * k, (m + 9) * k);
+    // 見出し
+    var y = T.top, x0 = m, xs = [x0, x0 + T.yearW, x0 + T.yearW + T.ageW];
+    ctx.fillStyle = col; ctx.fillRect(m * k, y * k, (W - 2 * m) * k, T.headH * k);
+    ctx.fillStyle = "#fff"; ctx.font = "bold " + (3.8 * k) + "px " + FONT; ctx.textBaseline = "middle";
+    ctx.fillText("年", (xs[0] + 2) * k, (y + T.headH / 2) * k);
+    if (T.ageW) ctx.fillText("年齢", (xs[1] + 1.5) * k, (y + T.headH / 2) * k);
+    if (C.lanes.length) C.lanes.forEach(function (ln, i) { var lx = xs[2] + T.colW * i; var t = ln + (C.laneBirth[ln] !== undefined ? "" : ""); ctx.save(); ctx.beginPath(); ctx.rect(lx * k, y * k, (T.colW - 1) * k, T.headH * k); ctx.clip(); ctx.fillText(t, (lx + 2) * k, (y + T.headH / 2) * k); ctx.restore(); });
+    else ctx.fillText("出来事", (xs[2] + 2) * k, (y + T.headH / 2) * k);
+    y += T.headH;
+    T.pages[pi].forEach(function (r, ri) {
+      if (C.stripe && ri % 2 === 1) { ctx.fillStyle = C.theme[1]; ctx.fillRect(m * k, y * k, (W - 2 * m) * k, r.h * k); }
+      ctx.strokeStyle = "#cfcfcf"; ctx.lineWidth = 0.2 * k; ctx.beginPath(); ctx.moveTo(m * k, (y + r.h) * k); ctx.lineTo((W - m) * k, (y + r.h) * k); ctx.stroke();
+      ctx.textBaseline = "alphabetic"; ctx.fillStyle = col; ctx.font = "bold " + (3.9 * k) + "px " + FONT;
+      var yl = yearLabel(C, r.ev); ctx.fillText(yl, (xs[0] + 2) * k, (y + T.lh) * k);
+      if (C.era === "both") { var e = eraOf(r.ev.y, r.ev.m); if (e) { var yw = ctx.measureText(yl).width / k; ctx.fillStyle = "#555"; ctx.font = (3.2 * k) + "px " + FONT; ctx.fillText(e, (xs[0] + 2 + yw + 1.5) * k, (y + T.lh) * k); } }
+      if (T.ageW) { ctx.fillStyle = "#333"; ctx.font = (3.6 * k) + "px " + FONT; ctx.fillText(ageText(C.birth, r.ev.y, C.era), (xs[1] + 1.5) * k, (y + T.lh) * k); }
+      ctx.fillStyle = "#1d1d1d"; ctx.font = (T.fs * k) + "px " + FONT;
+      r.cells.forEach(function (ls, ci) {
+        var cx = xs[2] + T.colW * ci + 2, ly = y;
+        ls.forEach(function (ln, li) { ctx.fillText(ln, cx * k, (ly + T.lh * (li + 1)) * k); });
+      });
+      y += r.h;
+    });
+    // 縦の線
+    ctx.strokeStyle = "#cfcfcf"; ctx.lineWidth = 0.2 * k;
+    var lines = [xs[1]]; if (T.ageW) lines.push(xs[2]); C.lanes.forEach(function (_, i) { if (i) lines.push(xs[2] + T.colW * i); });
+    lines.forEach(function (lx) { ctx.beginPath(); ctx.moveTo(lx * k, (T.top + T.headH) * k); ctx.lineTo(lx * k, y * k); ctx.stroke(); });
+    ctx.strokeStyle = col; ctx.lineWidth = 0.4 * k; ctx.strokeRect(m * k, T.top * k, (W - 2 * m) * k, (y - T.top) * k);
+    credit(ctx, W, H, k);
+  }
+  // 横に流れる年表: 等間隔に出来事を並べ、上下交互に札を出す
+  function lineLayout(C) {
+    var n = Math.max(1, C.list.length), np = Math.ceil(n / 10), per = Math.ceil(n / np), pages = [];
+    for (var i = 0; i < n; i += per) pages.push(C.list.slice(i, i + per));
+    return { W: 297, H: 210, pages: pages, per: per };
+  }
+  function drawLine(ctx, C, T, pi, k) {
+    var W = T.W, H = T.H, m = 14, col = C.theme[0], evs = T.pages[pi];
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W * k, H * k);
+    ctx.fillStyle = col; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.font = "bold " + (7.5 * k) + "px " + FONT;
+    ctx.fillText((C.title || "年表") + (T.pages.length > 1 ? "  (" + (pi + 1) + "/" + T.pages.length + ")" : ""), m * k, (m + 8) * k);
+    var ay = H / 2 + 6, x0 = m + 14, x1 = W - m - 12;
+    ctx.strokeStyle = col; ctx.lineWidth = 1.4 * k; ctx.beginPath(); ctx.moveTo(x0 * k, ay * k); ctx.lineTo(x1 * k, ay * k); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo((x1 + 5) * k, ay * k); ctx.lineTo((x1 - 1) * k, (ay - 3) * k); ctx.lineTo((x1 - 1) * k, (ay + 3) * k); ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+    var n = evs.length, step = n > 1 ? (x1 - x0 - 10) / (n - 1) : 0, cardW = n > 1 ? Math.min(72, Math.max(34, step * 1.85)) : 72, fs = n <= 6 ? 4.2 : 3.7, lh = fs * 1.4;
+    evs.forEach(function (ev, i) {
+      var x = n > 1 ? x0 + 5 + step * i : (x0 + x1) / 2, up = i % 2 === 0;
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x * k, ay * k, 1.8 * k, 0, Math.PI * 2); ctx.fill();
+      // 年
+      ctx.fillStyle = col; ctx.font = "bold " + (3.6 * k) + "px " + FONT; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      var yl = yearLabel(C, ev), ex = C.era === "both" ? eraOf(ev.y, ev.m) : "", ag = C.birth !== null ? ageText(C.birth, ev.y, C.era) : "";
+      ctx.fillText(yl, x * k, (ay + (up ? 5 : -5)) * k);
+      var sub = ex + (ex && ag ? "・" : "") + ag; if (sub) { ctx.fillStyle = "#555"; ctx.font = (3.2 * k) + "px " + FONT; ctx.fillText(sub, x * k, (ay + (up ? 9 : -9)) * k); }
+      // 札
+      ctx.font = (fs * k) + "px " + FONT; var ls = wrap(ctx, ev.text, (cardW - 4) * k).slice(0, 7), ch = ls.length * lh + 4;
+      var lift = n > 5 && i % 4 >= 2 ? 26 : 0, cy = up ? ay - 16 - ch - lift : ay + 16 + lift;
+      cy = Math.max(m + 14, Math.min(H - m - 8 - ch, cy));
+      var cx = Math.max(m, Math.min(W - m - cardW, x - cardW / 2));
+      ctx.strokeStyle = col; ctx.lineWidth = 0.3 * k; ctx.beginPath(); ctx.moveTo(x * k, ay * k); ctx.lineTo(x * k, (up ? cy + ch : cy) * k); ctx.stroke();
+      ctx.fillStyle = C.theme[1]; ctx.fillRect(cx * k, cy * k, cardW * k, ch * k); ctx.strokeRect(cx * k, cy * k, cardW * k, ch * k);
+      ctx.fillStyle = "#1d1d1d"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.font = (fs * k) + "px " + FONT;
+      ls.forEach(function (ln, li) { ctx.fillText(ln, (cx + 2) * k, (cy + 2 + lh * (li + 1) - 1) * k); });
+    });
+    credit(ctx, W, H, k);
+  }
+  function credit(ctx, W, H, k) { if (CREDIT) { ctx.fillStyle = "#8a8a8a"; ctx.font = (2.4 * k) + "px " + FONT; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic"; ctx.fillText("年表メーカー", (W - 8) * k, (H - 6) * k); } }
+  function layout(C) {
+    if (C.shape === "line") return lineLayout(C);
+    var c = document.createElement("canvas").getContext("2d");
+    var T = tableLayout(C, c, 1); return T;
+  }
+  function drawPage(ctx, C, T, pi, k) {
+    if (C.shape === "line") return drawLine(ctx, C, T, pi, k);
+    // 文字の折り返しは解像度によらず同じになるよう、k=1で測った行をそのまま使う
+    drawTable(ctx, C, T, pi, k);
+  }
+  function render(C, T, pi, dpi) {
+    var k = dpi / 25.4, c = document.createElement("canvas");
+    c.width = Math.round(T.W * k); c.height = Math.round(T.H * k);
+    var ctx = c.getContext("2d"); if (!ctx) return null;
+    drawPage(ctx, C, T, pi, k);
+    return c;
+  }
+
+  // ===== 画面 =====
+  var pvCanvas = null, lastC = null, lastT = null;
+  function refresh() {
+    var C = conf(), T = layout(C);
+    lastC = C; lastT = T;
+    var ps = $("inPage"), cur = +ps.value || 0; ps.textContent = "";
+    T.pages.forEach(function (_, i) { var o = document.createElement("option"); o.value = i; o.textContent = (i + 1) + "ページ目"; ps.appendChild(o); });
+    cur = Math.min(cur, T.pages.length - 1); ps.value = cur;
+    $("pageField").classList.toggle("hidden", T.pages.length < 2);
+    if (!pvCanvas) { pvCanvas = document.createElement("canvas"); pvCanvas.setAttribute("role", "img"); $("pv").appendChild(pvCanvas); }
+    var k = 900 / T.W, w = Math.round(T.W * k), h = Math.round(T.H * k);
+    if (pvCanvas.width !== w || pvCanvas.height !== h) { pvCanvas.width = w; pvCanvas.height = h; }
+    drawPage(pvCanvas.getContext("2d"), C, T, cur, k);
+    pvCanvas.setAttribute("aria-label", "年表の見本(" + (C.shape === "line" ? "横に流れる年表" : "表の年表") + "、" + (cur + 1) + "ページ目)");
+    setSt("sumNote", C.list.length ? "出来事" + C.list.length + "件・" + (C.shape === "line" ? "横に流れる年表(A4横)" : "表の年表(A4縦)") + "・" + T.pages.length + "ページ" + (C.lanes.length && C.shape === "table" ? "・" + C.lanes.length + "列" : "") : "年と出来事を入れると、ここに見本が出ます", false);
+    var warn = [];
+    if (C.cut) warn.push(EDITION === "full" ? "出来事は500件までです(501件目からは入りません)" : "無料版は出来事30件までです(31件目からは入りません。買い切り版は500件まで)");
+    if (C.bad.length) warn.push("年が読み取れない行があります(" + C.bad.slice(0, 3).join("・") + (C.bad.length > 3 ? "ほか" : "") + ")。行のはじめに年の数字を書いてください");
+    if (C.empty.length) warn.push("出来事が書かれていない行があります(" + C.empty.slice(0, 3).join("・") + ")");
+    if (C.zero.length) warn.push("西暦に0年はないので、0年の行は入れていません(紀元前1年の次は1年)");
+    if (T.clipped) warn.push("1つの年の出来事が多すぎて、1ページに入りきらない所を「…」で切りました。列を減らすか、出来事を分けてください");
+    if (C.laneCut) warn.push("列は6つまでです(7つ目からの名前の出来事は、いちばん左の列に入ります)");
+    if (C.shape === "line" && C.lanes.length) warn.push("人物ごとの列は「表の年表」だけで使えます");
+    if (C.shape === "line" && C.list.some(function (e) { return Array.from(e.text).length > 60; })) warn.push("横に流れる年表は、長い出来事が途中で切れることがあります(7行まで)。長いときは「表の年表」がおすすめです");
+    $("inStripe").disabled = C.shape === "line";
+    if ($("inLanes")) $("inLanes").disabled = C.shape === "line";
+    setSt("warnNote", warn.join("。") + (warn.length ? "。" : ""), !!(C.cut || C.bad.length));
+    save();
+  }
+
+  // ===== 自動保存 =====
+  var FIELDS = ["inTitle", "inEvents", "inBirth", "inEra", "inLanes", "inShape", "inColor"];
+  function save() { try { var o = {}; FIELDS.forEach(function (id) { if ($(id)) o[id] = $(id).value; }); o.inStripe = $("inStripe").checked; localStorage.setItem(STORE, JSON.stringify(o)); } catch (e) {} }
+  function load() {
+    try {
+      var o = JSON.parse(localStorage.getItem(STORE) || "null"); if (!o || typeof o !== "object") return;
+      FIELDS.forEach(function (id) { var v = o[id], el = $(id); if (typeof v !== "string" || !el) return; if (el.tagName === "SELECT") { if ([].some.call(el.options, function (op) { return op.value === v; })) el.value = v; } else el.value = v.slice(0, el.tagName === "TEXTAREA" ? 60000 : 30); });
+      if (typeof o.inStripe === "boolean") $("inStripe").checked = o.inStripe;
+    } catch (e) {}
+  }
+  $("clearBtn").addEventListener("click", function () {
+    if (!window.confirm("入力した出来事・名前・生まれた年を全部消しますか?(このブラウザに自動で保存した内容も消えます)")) return;
+    ["inTitle", "inEvents", "inBirth", "inLanes"].forEach(function (id) { if ($(id)) $(id).value = ""; });
+    try { localStorage.removeItem(STORE); } catch (e) {}
+    refresh(); setSt("outSt", "消しました。");
+  });
+
+  // ===== イベント =====
+  var timer = null;
+  function later() { clearTimeout(timer); timer = setTimeout(function () { timer = null; refresh(); }, 300); }
+  function flush() { if (timer) { clearTimeout(timer); timer = null; refresh(); } }
+  ["inEra", "inShape", "inColor", "inStripe", "inPage"].forEach(function (id) { $(id).addEventListener("change", refresh); });
+  ["inTitle", "inEvents", "inBirth", "inLanes"].forEach(function (id) { if ($(id)) $(id).addEventListener("input", later); });
+
+  // ===== 印刷・保存 =====
+  function toBlob(c) { return new Promise(function (res) { c.toBlob(function (b) { res(b); }, "image/png"); }); }
+  function download(blob, name) {
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function renderAll(C, T, dpi) {
+    var out = [], p = Promise.resolve();
+    T.pages.forEach(function (_, i) { p = p.then(function () { var c = render(C, T, i, dpi); if (!c) throw new Error("canvas"); return toBlob(c).then(function (b) { c.width = c.height = 0; if (!b) throw new Error("blob"); out.push(b); }); }); });
+    return p.then(function () { return out; });
+  }
+  var busyFlag = false, printUrls = [];
+  function clearPrint() { printUrls.forEach(function (u) { URL.revokeObjectURL(u); }); printUrls = []; $("printArea").textContent = ""; document.body.classList.remove("printing"); $("pageStyle").textContent = "@page { size: A4 portrait; margin: 0; }"; }
+  function ready() { flush(); if (!lastC.list.length) { setSt("outSt", "年と出来事を1つ以上入れてください。", true); return false; } return true; }
+  $("printBtn").addEventListener("click", function () {
+    if (busyFlag || !ready()) return;
+    var C = lastC, T = lastT;
+    busyFlag = true; clearPrint();
+    $("pageStyle").textContent = "@page { size: " + T.W + "mm " + T.H + "mm; margin: 0; }";
+    setSt("outSt", "印刷用の画像を作っています…");
+    renderAll(C, T, T.pages.length > 20 ? 200 : 250).then(function (blobs) {
+      return Promise.all(blobs.map(function (b) {
+        return new Promise(function (res, rej) { var u = URL.createObjectURL(b), im = new Image(); printUrls.push(u); im.style.width = (T.W - 0.3) + "mm"; im.style.height = (T.H - 0.3) + "mm"; im.onload = res; im.onerror = function () { rej(new Error("img")); }; im.alt = ""; im.src = u; $("printArea").appendChild(im); });
+      })).then(function () { return blobs.length; });
+    }).then(function (cnt) {
+      document.body.classList.add("printing");
+      setSt("outSt", "印刷画面を開きました(" + cnt + "枚)。倍率は「100%」がおすすめです。");
+      track("nenpyo_print", { n: C.list.length, shape: C.shape, era: C.era, lanes: C.lanes.length, age: C.birth !== null ? 1 : 0, pages: cnt });
+      setTimeout(function () { window.print(); }, 50);
+    }).catch(function () { clearPrint(); setSt("outSt", "印刷用の画像を作れませんでした。ページを読み込み直して、もう一度お試しください。", true); }).then(function () { busyFlag = false; });
+  });
+  window.addEventListener("afterprint", clearPrint);
+  var saveMany = function (blobs, names) {
+    var p = Promise.resolve();
+    blobs.forEach(function (b, i) { p = p.then(function () { download(b, names[i]); return new Promise(function (r) { setTimeout(r, 700); }); }); });
+    return p;
+  };
+  
+  $("pngBtn").addEventListener("click", function () {
+    if (busyFlag || !ready()) return;
+    var C = lastC, T = lastT, safe = (C.title || "").replace(/[\/\\:*?"<>|\u0000-\u001f]/g, "").replace(/[. ]+$/, "") || "年表";
+    var names = T.pages.map(function (_, i) { return safe + (T.pages.length > 1 ? "_" + ("0" + (i + 1)).slice(-2) : "") + ".png"; }), zipName = safe + "_" + T.pages.length + "枚.zip";
+    busyFlag = true; setSt("outSt", "画像を作っています…");
+    renderAll(C, T, T.pages.length > 20 ? 200 : 250).then(function (blobs) {
+      var phone = window.matchMedia && matchMedia("(pointer:coarse)").matches, files = null;
+      track("nenpyo_save", { n: C.list.length, shape: C.shape, era: C.era, lanes: C.lanes.length, age: C.birth !== null ? 1 : 0, pages: blobs.length });
+      try { files = blobs.map(function (b, i) { return new File([b], names[i], { type: "image/png" }); }); } catch (e) {}
+      if (phone && files && navigator.canShare && navigator.canShare({ files: files })) {
+        setSt("outSt", "共有メニューが開きます。「画像を保存」や「ダウンロード」を選んでください。");
+        return navigator.share({ files: files }).then(function () { setSt("outSt", "保存しました。"); }, function (err) {
+          if (err && err.name === "AbortError") { setSt("outSt", "共有をやめました。もう一度押すと保存できます。"); return; }
+          return saveMany(blobs, names, zipName).then(function () { setSt("outSt", "保存しました。"); });
+        });
+      }
+      return saveMany(blobs, names, zipName).then(function () { setSt("outSt", (blobs.length > 1 ? blobs.length + "枚の画像を" : "画像を") + "保存しました。" + (blobs.length > 1 && EDITION !== "full" ? "ブラウザが「複数のファイルのダウンロード」を確かめてきたら、許可してください。" : "")); });
+    }).catch(function () { setSt("outSt", "画像を作れませんでした。ページを読み込み直して、もう一度お試しください。", true); }).then(function () { busyFlag = false; });
+  });
+
+  if (EDITION === "full") $("pro-section").classList.add("hidden");
+  if (EDITION !== "full") {
+    $("privacyNote").innerHTML = '入力した内容はどこにも送信されません(すべてこのブラウザの中で処理し、このブラウザにだけ自動で保存します)。このページでは利用状況の把握のためにアクセス解析(Google Analytics)を使っています(入力した内容は含みません)。<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用について</a>';
+  }
+  $("evHint").textContent = (EDITION === "full" ? "500件まで。" : "30件まで(買い切り版は500件まで)。") + "出来事は80文字まで。「2002年4月」のように月も書けます。Excelの列(年・出来事" + (EDITION === "full" ? "・人物" : "") + ")の貼り付けや「|」区切りもOK";
+  load();
+  refresh();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+})();
+</script>
+</body>
+</html>
